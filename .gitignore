@@ -1,0 +1,7 @@
+#
+#	gitignore for KAPI C Console version
+#
+
+test.c
+*.o
+
