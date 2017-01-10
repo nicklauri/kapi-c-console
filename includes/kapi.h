@@ -17,6 +17,11 @@
     #error Choose platform: -D_LINUX: Linux; -D_WINDOWS_: Windows.
 #endif
 
+#define debug printf("%s:%d\n", __func__, __LINE__);
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*************************** KAPI: console input ****************************/
 
@@ -59,6 +64,11 @@ char *k_streinput(char);
     #define B_WHITE
 #endif
 #endif
+
+bool clrscr();
+int  getmaxX();
+int  getmaxY();
+bool gotoxy(size_t, size_t);
 
 /*************************** KAPI: cstring        ****************************/
 /**
@@ -120,8 +130,8 @@ typedef struct OBJ_T {
         uint  u;
         float f;
         long  l;
-        char *str;
         void *v;
+        void *(*func)(void*);
     } *val;
 } obj_t;
 
@@ -134,12 +144,15 @@ typedef struct OBJ_T {
 #define D_FLOAT     5
 #define D_LONG      6
 #define D_STRING    7
-#define D_OBJECT    8
+#define D_FUNCTION  8
 
-int kobj_init(obj_t *);
+obj_t *kobj_init();
 int kobj_append(obj_t *, int, void *);
 int kobj_insert(obj_t *, size_t, int, void *);
 int kobj_delete(obj_t *, size_t);
 int kobj_free(obj_t *);
 
+#ifdef __cplusplus
+}
+#endif
 #endif
