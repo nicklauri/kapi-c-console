@@ -18,7 +18,15 @@
 ///
 ///     kobj_init
 ///
-int kobj_init(obj_t *o) {
+obj_t *kobj_init() {
+    obj_t *o;
+    if((o = (obj_t *) malloc(sizeof(o))) == NULL) {
+#ifdef _DEBUG_
+        fprintf(stderr, "kapi: kobj_init: unable to allocate memory to init kobj.\n");
+#endif
+        return NULL;
+    }
+
     o->len  = 0;
     o->type = (int *) malloc(ARRAY_BLOCK * sizeof(o->type));
     o->val  = malloc(ARRAY_BLOCK * sizeof(o->val));
@@ -31,11 +39,11 @@ int kobj_init(obj_t *o) {
             fprintf(stderr, "kapi: kobj_init: o->val is NULL.\n");
 #endif
         o = NULL;
-        return 1;
+        return NULL;
     }
     o->type[0]  = D_NULL;
     o->val[0].v = NULL;
-    return 0;
+    return o;
 }
 
 ///
@@ -73,7 +81,11 @@ int kobj_insert(obj_t *o, size_t index, int type, void *value) {
 
     o->len++;
     o->type[index]  = type;
-    o->val[index].v = value;
+
+    if(o->type[index] == D_FUNCTION)
+        o->val[index].func = value;
+    else
+        o->val[index].v = value;
     return 0;
 }
 
@@ -105,5 +117,6 @@ int kobj_delete(obj_t *o, size_t index) {
 int kobj_free(obj_t *o) {
     free(o->type);
     free(o->val);
+    free(o);
     return 0;
 }
