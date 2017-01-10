@@ -17,24 +17,22 @@
     #error Choose platform: -D_LINUX: Linux; -D_WINDOWS_: Windows.
 #endif
 
-#define debug printf("%s:%d\n", __func__, __LINE__);
+#define _debug printf("%s:%d\n", __func__, __LINE__);
 
 #ifdef __cplusplus
-extern "C" {
+    extern "C" {
 #endif
 
 /*************************** KAPI: console input ****************************/
 
 /**
  *  @func: k_strinput
- *  @args:
- *      char **p    : pointer to char * (can be NULL or address of a 'char *' 
- *                    pointer)
+ *  @args: (null)
  *  @ret : (char *) a pointer to string (the same as above)
  *  @desc: return a string without segmentation fault ;)
  *         String is allocated on HEAP
  */
-char *k_strinput();
+char *k_strinput(void);
 
 /**
  *  @func: k_strneinput
@@ -54,20 +52,10 @@ char *k_strneinput(void);
 char *k_streinput(char);
 
 /*************************** KAPI: console output ****************************/
-#ifndef COLORS
-#define COLORS
-#ifdef _LINUX_
-    #define B_WHITE
-    #define F_WHITE
-    #define S_BOLD
-#elif defined _WINDOWS_
-    #define B_WHITE
-#endif
-#endif
 
-bool clrscr();
 int  getmaxX();
 int  getmaxY();
+bool clrscr();
 bool gotoxy(size_t, size_t);
 
 /*************************** KAPI: cstring        ****************************/
@@ -131,9 +119,13 @@ typedef struct OBJ_T {
         float f;
         long  l;
         void *v;
-        void *(*func)(void*);
+        void *(*func)(void *, ...);
     } *val;
 } obj_t;
+
+static char *stype[] = {"NULL", "BOOL", "BYTE", "SHORT", "INTEGER", 
+        "UINTERGER", "FLOAT", "LONG", "STRING", "FUNCTION"};
+static size_t stype_len = 10;
 
 #define D_NULL      0
 #define D_BOOL      1
@@ -141,16 +133,18 @@ typedef struct OBJ_T {
 #define D_CHAR      D_BYTE
 #define D_SHORT     3
 #define D_INTEGER   4
-#define D_FLOAT     5
-#define D_LONG      6
-#define D_STRING    7
-#define D_FUNCTION  8
+#define D_UINTEGER  5
+#define D_FLOAT     6
+#define D_LONG      7
+#define D_STRING    8
+#define D_FUNCTION  9
 
 obj_t *kobj_init();
 int kobj_append(obj_t *, int, void *);
 int kobj_insert(obj_t *, size_t, int, void *);
 int kobj_delete(obj_t *, size_t);
 int kobj_free(obj_t *);
+bool kobj_print(obj_t *);
 
 #ifdef __cplusplus
 }

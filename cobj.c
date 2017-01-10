@@ -81,19 +81,15 @@ int kobj_insert(obj_t *o, size_t index, int type, void *value) {
 
     o->len++;
     o->type[index]  = type;
-
-    if(o->type[index] == D_FUNCTION)
-        o->val[index].func = value;
-    else
-        o->val[index].v = value;
+    o->val[index].v = value;
     return 0;
 }
 
 ///
 ///     kobj_append
 ///
-int kobj_append(obj_t *o, int i, void *v) {
-    return kobj_insert(o, o->len, i, v);
+int inline kobj_append(obj_t *o, int t, void *v) {
+    return kobj_insert(o, o->len, t, v);
 }
 
 ///
@@ -119,4 +115,47 @@ int kobj_free(obj_t *o) {
     free(o->val);
     free(o);
     return 0;
+}
+
+
+///
+///     kobj_print
+///
+bool kobj_print(obj_t *o) {
+    char char_mid[] = "├──", char_last[] = "└──", char_line[] = "│  ";
+    int i;
+    printf("object <0x%08x>\n", o);
+    for(i = 0; i < o->len - 1; i++) {
+        printf("%s [%d]type: %8s at 0x%08x", char_mid, i, stype[o->type[i]], 
+            &(o->val[i]));
+        if(o->type[i] == D_NULL)
+            continue;
+        else if(o->type[i] == D_STRING)
+            printf(" ─ len: %d\n%s      value: '%s'\n",
+                strlen(o->val[i].v), char_line, o->val[i].v);
+        else if(o->type[i] == D_INTEGER || o->type[i] == D_SHORT ||
+            o->type[i] == D_BYTE || o->type[i] == D_LONG)
+            printf("\n%s   value: %ld\n", char_line, o->val[i].l);
+        else if(o->type[i] == D_FLOAT)
+            printf("\n%s   value: %f\n", char_line, o->val[i].f);
+        else if(o->type[i] == D_FUNCTION)
+            printf("\n");
+    }
+
+    i = o->len - 1;
+    printf("%s [%d]type: %8s at 0x%08x", char_last, i, stype[o->type[i]], 
+        &(o->val[i]));
+    if(o->type[i] == D_NULL)
+        NULL;
+    else if(o->type[i] == D_STRING)
+        printf(" ─ len: %d\n      value: '%s'\n",
+            strlen(o->val[i].v), o->val[i].v);
+    else if(o->type[i] == D_INTEGER || o->type[i] == D_SHORT ||
+        o->type[i] == D_BYTE || o->type[i] == D_LONG)
+        printf("\n   value: %ld\n", o->val[i].l);
+    else if(o->type[i] == D_FLOAT)
+        printf("\n    value: %f\n", o->val[i].f);
+    else if(o->type[i] == D_FUNCTION)
+        NULL;
+    return true;
 }

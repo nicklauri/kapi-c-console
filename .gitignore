@@ -2,6 +2,14 @@
 #	gitignore for KAPI C Console version
 #
 
+a.out
 test.c
-*.o
+test*.c
 
+*.a
+*.exe
+*.run
+*.elf
+
+# On incomplete stage, I will hide folder 'examples'
+examples
